@@ -16,6 +16,54 @@
   font-family: var(--font-geist-sans);
 }
 
+.ascButton {
+  padding: 8px 16px;
+  border: 1px solid var(--gray-alpha-200);
+  border-radius: 8px;
+  cursor: pointer;
+  color: var(--foreground);
+}
+
+.descButton {
+  background: 'transparent';
+  padding: 8px 16px;
+  border: 1px solid var(--gray-alpha-200);
+  border-radius: 8px;
+  cursor: pointer;
+  color: var(--foreground);
+}
+
+.buttonsContainer{
+  display: flex;
+  gap: 16px;
+}
+
+.searchInput{
+  padding: 8px;
+  width: 100%;
+  margin-bottom: '20px';
+  border: 1px solid var(--gray-alpha-200);
+  border-radius: 8px;
+  background: var(--gray-alpha-100);
+  color: var(--foreground);
+}
+
+.card{
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px;
+  border-radius: 12px;
+  background: var(--gray-alpha-100);
+  transition: background 0.2s;
+}
+
+.cardContainer{
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
 @media (prefers-color-scheme: dark) {
   .page {
     --gray-rgb: 255, 255, 255;
@@ -58,6 +106,7 @@
 
 .ctas {
   display: flex;
+  flex-direction: column;
   gap: 16px;
 }
 
@@ -165,4 +214,31 @@ a.secondary {
   .logo {
     filter: invert();
   }
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 24px;
+}
+
+.pageButton {
+  padding: 8px 16px;
+  border: 1px solid var(--gray-alpha-200);
+  border-radius: 8px;
+  background: transparent;
+  cursor: pointer;
+  color: var(--foreground);
+  transition: background 0.2s;
+}
+
+.pageButton:hover {
+  background: var(--gray-alpha-100);
+}
+
+.pageButton.active {
+  background: var(--foreground);
+  color: var(--background);
+  border-color: transparent;
 }
