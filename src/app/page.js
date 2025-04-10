@@ -13,28 +13,47 @@ export default function Home() {
     const url = "https://pokeapi.co/api/v2/pokemon?limit=80";
     fetch(url)
       .then((response) => response.json())
-      .then((data) => {
-        const pokemonList = data.results.map((pokemon) => {
+      .then(async (data) => {
+        const pokemonPromises = data.results.map(async (pokemon) => {
           const id = pokemon.url.split("/")[6];
-          const moveUrl = `https://pokeapi.co/api/v2/move/${1}`
 
-          const move = fetch(moveUrl).then((response) => response.json());
+          // Fetch pokemon details to get moves
+          const pokemonResponse = await fetch(
+            `https://pokeapi.co/api/v2/pokemon/${id}`
+          );
+          const pokemonData = await pokemonResponse.json();
 
-          console.log(move);
+          // Get a random move from the pokemon's moves
+          const randomMoveIndex = Math.floor(
+            Math.random() * pokemonData.moves.length
+          );
+          const moveUrl = pokemonData.moves[randomMoveIndex].move.url;
+          // Fetch move details
+          const moveResponse = await fetch(moveUrl);
+          const moveData = await moveResponse.json();
 
           return {
             id,
             name: pokemon.name,
-            defense: 'defensa ataque',
+            defense: moveData.name,
           };
         });
+
+        const pokemonList = await Promise.all(pokemonPromises);
+        pokemonList.sort((a, b) => a.name.localeCompare(b.name));
         setPokemons(pokemonList);
+      })
+      .catch((error) => {
+        console.error("Error fetching pokemon data:", error);
       });
   }, []);
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentPokemons = filteredPokemons.length > 0 ? filteredPokemons : pokemons.slice(indexOfFirstItem, indexOfLastItem);
+  const currentPokemons =
+    filteredPokemons.length > 0
+      ? filteredPokemons.slice(indexOfFirstItem, indexOfLastItem)
+      : pokemons.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(pokemons.length / itemsPerPage);
 
   const handlePageChange = (pageNumber) => {
@@ -44,18 +63,24 @@ export default function Home() {
   const handleSearch = (e) => {
     e.preventDefault();
     const query = e.target.value;
-    const currentFilterPokemons = pokemons.filter((pokemon) => pokemon.name.includes(query));
+    const currentFilterPokemons = pokemons.filter((pokemon) =>
+      pokemon.name.includes(query)
+    );
     setFilteredPokemons(currentFilterPokemons);
   };
 
-  const handleSortAsc = (e) => {
-    const sortedPokemons = pokemons.sort((a, b) => a.name.localeCompare(b.name));
+  const handleSortAsc = () => {
+    const sortedPokemons = [...pokemons].sort((a, b) =>
+      a.name.localeCompare(b.name)
+    );
     setPokemons(sortedPokemons);
   };
 
-  const handleSortDesc = (e) => {
-    const sortedPokemons = pokemons.sort((a, b) => a.name.localeCompare(b.name));
-    setPokemons(sortedPokemons.reverse());
+  const handleSortDesc = () => {
+    const sortedPokemons = [...pokemons].sort((a, b) =>
+      b.name.localeCompare(a.name)
+    );
+    setPokemons(sortedPokemons);
   };
 
   return (
@@ -63,11 +88,19 @@ export default function Home() {
       <main className={styles.main}>
         <div className={styles.ctas}>
           <div className={styles.searchContainer}>
-            <input placeholder="Buscar pokemon" onChange={(e) => handleSearch(e)} className={styles.searchInput}/>
+            <input
+              placeholder="Buscar pokemon"
+              onChange={(e) => handleSearch(e)}
+              className={styles.searchInput}
+            />
           </div>
           <div className={styles.buttonsContainer}>
-            <button onClick={handleSortAsc} className={styles.ascButton}>Ascendente</button>
-            <button onClick={handleSortDesc} className={styles.descButton}>Descendente</button>
+            <button onClick={handleSortAsc} className={styles.ascButton}>
+              Ascendente
+            </button>
+            <button onClick={handleSortDesc} className={styles.descButton}>
+              Descendente
+            </button>
           </div>
           <div className={styles.cardContainer}>
             {currentPokemons.map((pokemon) => (
@@ -87,19 +120,21 @@ export default function Home() {
               </div>
             ))}
           </div>
-          
+
           <div className={styles.pagination}>
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map((number) => (
-              <button
-                key={number}
-                className={`${styles.pageButton} ${
-                  currentPage === number ? styles.active : ''
-                }`}
-                onClick={() => handlePageChange(number)}
-              >
-                {number}
-              </button>
-            ))}
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+              (number) => (
+                <button
+                  key={number}
+                  className={`${styles.pageButton} ${
+                    currentPage === number ? styles.active : ""
+                  }`}
+                  onClick={() => handlePageChange(number)}
+                >
+                  {number}
+                </button>
+              )
+            )}
           </div>
         </div>
       </main>
