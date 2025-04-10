@@ -103,7 +103,7 @@ export default function Home() {
             </button>
           </div>
           <div className={styles.cardContainer}>
-            {currentPokemons.map((pokemon) => (
+            {currentPokemons.length > 0 ?currentPokemons.map((pokemon) => (
               <div className={styles.card} key={pokemon.name}>
                 <div className={styles.imageContainer}>
                   <Image
@@ -118,7 +118,7 @@ export default function Home() {
                   <p>{pokemon.defense}</p>
                 </div>
               </div>
-            ))}
+            )): <p>Loading...</p>}
           </div>
 
           <div className={styles.pagination}>
